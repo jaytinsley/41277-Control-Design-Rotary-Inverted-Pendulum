@@ -1,0 +1,8 @@
+rtGetInf.o: \
+ /Users/jaytinsley/Documents/GitHub/41277-Control-Design-Rotary-Inverted-Pendulum/Teensy41_QS2/Teensy41_QS2_ert_rtw/rtGetInf.c \
+ /Users/jaytinsley/Documents/GitHub/41277-Control-Design-Rotary-Inverted-Pendulum/Teensy41_QS2/Teensy41_QS2_ert_rtw/rtwtypes.h \
+ /Users/jaytinsley/Documents/GitHub/41277-Control-Design-Rotary-Inverted-Pendulum/Teensy41_QS2/Teensy41_QS2_ert_rtw/rtGetInf.h \
+ /Users/jaytinsley/Documents/GitHub/41277-Control-Design-Rotary-Inverted-Pendulum/Teensy41_QS2/Teensy41_QS2_ert_rtw/rt_nonfinite.h
+/Users/jaytinsley/Documents/GitHub/41277-Control-Design-Rotary-Inverted-Pendulum/Teensy41_QS2/Teensy41_QS2_ert_rtw/rtwtypes.h:
+/Users/jaytinsley/Documents/GitHub/41277-Control-Design-Rotary-Inverted-Pendulum/Teensy41_QS2/Teensy41_QS2_ert_rtw/rtGetInf.h:
+/Users/jaytinsley/Documents/GitHub/41277-Control-Design-Rotary-Inverted-Pendulum/Teensy41_QS2/Teensy41_QS2_ert_rtw/rt_nonfinite.h:
