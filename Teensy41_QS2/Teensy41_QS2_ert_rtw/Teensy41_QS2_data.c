@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'Teensy41_QS2'.
  *
- * Model version                  : 1.106
+ * Model version                  : 1.108
  * Simulink Coder version         : 24.2 (R2024b) 21-Jun-2024
- * C/C++ source code generated on : Thu Oct 16 17:23:41 2025
+ * C/C++ source code generated on : Tue Oct 28 19:15:10 2025
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex
@@ -28,43 +28,32 @@ P_Teensy41_QS2_T Teensy41_QS2_P = {
    */
   0.001,
 
-  /* Mask Parameter: PIDController1_D
-   * Referenced by: '<S35>/Derivative Gain'
-   */
-  2.5,
-
-  /* Mask Parameter: PIDController2_D
-   * Referenced by: '<S87>/Derivative Gain'
-   */
-  -2.0,
-
-  /* Mask Parameter: PIDController2_DifferentiatorIC
-   * Referenced by: '<S89>/UD'
-   */
-  0.0,
-
   /* Mask Parameter: PIDController1_InitialCondition
-   * Referenced by: '<S37>/Filter'
+   * Referenced by: '<S39>/Filter'
    */
   0.0,
 
-  /* Mask Parameter: PIDController1_N
-   * Referenced by: '<S45>/Filter Coefficient'
+  /* Mask Parameter: PIDController1_InitialConditi_m
+   * Referenced by: '<S44>/Integrator'
    */
-  0.5263,
+  0.0,
 
-  /* Mask Parameter: PIDController1_P
-   * Referenced by: '<S47>/Proportional Gain'
+  /* Mask Parameter: PIDController1_LowerSaturationL
+   * Referenced by:
+   *   '<S51>/Saturation'
+   *   '<S36>/DeadZone'
    */
-  30.0,
+  -10.0,
 
-  /* Mask Parameter: PIDController2_P
-   * Referenced by: '<S101>/Proportional Gain'
+  /* Mask Parameter: PIDController1_UpperSaturationL
+   * Referenced by:
+   *   '<S51>/Saturation'
+   *   '<S36>/DeadZone'
    */
-  -2.0,
+  10.0,
 
   /* Mask Parameter: CompareToConstant_const
-   * Referenced by: '<S114>/Constant'
+   * Referenced by: '<S116>/Constant'
    */
   20.0,
 
@@ -73,10 +62,50 @@ P_Teensy41_QS2_T Teensy41_QS2_P = {
    */
   0.0,
 
-  /* Computed Parameter: Filter_gainval
-   * Referenced by: '<S37>/Filter'
+  /* Expression: 0
+   * Referenced by: '<S34>/Constant1'
+   */
+  0.0,
+
+  /* Expression: 112
+   * Referenced by: '<S5>/Constant'
+   */
+  112.0,
+
+  /* Expression: 1
+   * Referenced by: '<S5>/Constant4'
    */
   1.0,
+
+  /* Computed Parameter: Integrator_gainval
+   * Referenced by: '<S44>/Integrator'
+   */
+  0.0005,
+
+  /* Expression: -3.61
+   * Referenced by: '<S5>/Constant2'
+   */
+  -3.61,
+
+  /* Computed Parameter: Filter_gainval
+   * Referenced by: '<S39>/Filter'
+   */
+  0.0005,
+
+  /* Expression: 0.188
+   * Referenced by: '<S5>/Constant3'
+   */
+  0.188,
+
+  /* Expression: 0
+   * Referenced by: '<S34>/Clamping_zero'
+   */
+  0.0,
+
+  /* Expression: 57.2
+   * Referenced by: '<S5>/Constant1'
+   */
+  57.2,
 
   /* Expression: 1
    * Referenced by: '<S5>/Gain'
@@ -104,39 +133,59 @@ P_Teensy41_QS2_T Teensy41_QS2_P = {
   0.0,
 
   /* Expression: 10
-   * Referenced by: '<S117>/SPI WriteRead'
+   * Referenced by: '<S119>/SPI WriteRead'
    */
   10.0,
 
   /* Computed Parameter: encoder0_Y0
-   * Referenced by: '<S117>/encoder0'
+   * Referenced by: '<S119>/encoder0'
    */
   0.0,
 
   /* Computed Parameter: encoder1_Y0
-   * Referenced by: '<S117>/encoder1'
+   * Referenced by: '<S119>/encoder1'
    */
   0.0,
 
   /* Expression: 10
-   * Referenced by: '<S117>/+- 10V'
+   * Referenced by: '<S119>/+- 10V'
    */
   10.0,
 
   /* Expression: -10
-   * Referenced by: '<S117>/+- 10V'
+   * Referenced by: '<S119>/+- 10V'
    */
   -10.0,
+
+  /* Expression: 0
+   * Referenced by: '<Root>/Unit Delay1'
+   */
+  0.0,
+
+  /* Expression: 180/pi
+   * Referenced by: '<S3>/Gain'
+   */
+  57.295779513082323,
 
   /* Expression: 0
    * Referenced by: '<Root>/Unit Delay'
    */
   0.0,
 
-  /* Expression: 0
-   * Referenced by: '<Root>/Unit Delay1'
+  /* Expression: 180/pi
+   * Referenced by: '<S2>/Gain'
    */
-  0.0,
+  57.295779513082323,
+
+  /* Expression: 10
+   * Referenced by: '<Root>/+- 10V1'
+   */
+  10.0,
+
+  /* Expression: -10
+   * Referenced by: '<Root>/+- 10V1'
+   */
+  -10.0,
 
   /* Expression: 0
    * Referenced by: '<Root>/RED'
@@ -203,20 +252,10 @@ P_Teensy41_QS2_T Teensy41_QS2_P = {
    */
   0.0,
 
-  /* Expression: 180/pi
-   * Referenced by: '<S3>/Gain'
-   */
-  57.295779513082323,
-
-  /* Expression: 180/pi
-   * Referenced by: '<S2>/Gain'
-   */
-  57.295779513082323,
-
-  /* Expression: 1
+  /* Expression: 0
    * Referenced by: '<Root>/Motor Enable'
    */
-  1.0,
+  0.0,
 
   /* Expression: 1
    * Referenced by: '<Root>/Protection'
@@ -224,14 +263,34 @@ P_Teensy41_QS2_T Teensy41_QS2_P = {
   1.0,
 
   /* Expression: 180/pi
-   * Referenced by: '<S118>/Gain'
+   * Referenced by: '<S120>/Gain'
    */
   57.295779513082323,
 
   /* Computed Parameter: TmpRTBAtQS2Inport2_InitialCondi
    * Referenced by:
    */
-  false
+  false,
+
+  /* Computed Parameter: Constant_Value_j
+   * Referenced by: '<S34>/Constant'
+   */
+  1,
+
+  /* Computed Parameter: Constant2_Value_o
+   * Referenced by: '<S34>/Constant2'
+   */
+  -1,
+
+  /* Computed Parameter: Constant3_Value_m
+   * Referenced by: '<S34>/Constant3'
+   */
+  1,
+
+  /* Computed Parameter: Constant4_Value_e
+   * Referenced by: '<S34>/Constant4'
+   */
+  -1
 };
 
 /*

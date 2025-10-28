@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'Teensy41_QS2'.
  *
- * Model version                  : 1.106
+ * Model version                  : 1.108
  * Simulink Coder version         : 24.2 (R2024b) 21-Jun-2024
- * C/C++ source code generated on : Thu Oct 16 17:23:41 2025
+ * C/C++ source code generated on : Tue Oct 28 19:15:10 2025
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex
@@ -18,9 +18,9 @@
  */
 
 #include "Teensy41_QS2.h"
+#include <math.h>
 #include "Teensy41_QS2_private.h"
 #include <string.h>
-#include <math.h>
 #include "rt_nonfinite.h"
 #include "rtwtypes.h"
 #include "multiword_types.h"
@@ -158,18 +158,20 @@ real_T rt_roundd_snf(real_T u)
 /* Model step function for TID0 */
 void Teensy41_QS2_step0(void)          /* Sample time: [0.0005s, 0.0s] */
 {
+  uint64m_T tmp;
   uint64m_T tmp_0;
   uint64m_T tmp_1;
-  uint64m_T tmp_2;
-  uint64m_T tmp_3;
-  uint64m_T tmp_4;
-  real_T tmp_5;
+  real_T tmp_3;
+  real_T y;
   int32_T i;
+  uint32_T TriggeredSubsystem_ELAPS_T;
   int16_T x;
   uint16_T motor;
-  uint8_T tmp_6;
+  int8_T rtb_Switch1;
+  int8_T tmp_2;
+  uint8_T tmp_4;
+  boolean_T rtb_RelationalOperator;
   boolean_T startup;
-  boolean_T tmp;
   ZCEventType zcEvent;
 
   {                                    /* Sample time: [0.0005s, 0.0s] */
@@ -181,6 +183,18 @@ void Teensy41_QS2_step0(void)          /* Sample time: [0.0005s, 0.0s] */
 
   /* Reset subsysRan breadcrumbs */
   srClearBC(Teensy41_QS2_DW.QS2_SubsysRanBC);
+
+  /* Gain: '<S3>/Gain' incorporates:
+   *  UnitDelay: '<Root>/Unit Delay1'
+   */
+  Teensy41_QS2_B.Gain = Teensy41_QS2_P.Gain_Gain_m *
+    Teensy41_QS2_DW.UnitDelay1_DSTATE;
+
+  /* Gain: '<S2>/Gain' incorporates:
+   *  UnitDelay: '<Root>/Unit Delay'
+   */
+  Teensy41_QS2_B.Gain_b = Teensy41_QS2_P.Gain_Gain_k *
+    Teensy41_QS2_DW.UnitDelay_DSTATE;
 
   /* Outputs for Atomic SubSystem: '<Root>/Controller' */
   /* DiscretePulseGenerator: '<S1>/Pulse Generator1' */
@@ -203,59 +217,209 @@ void Teensy41_QS2_step0(void)          /* Sample time: [0.0005s, 0.0s] */
                      &Teensy41_QS2_PrevZCX.TriggeredSubsystem_Trig_ZCE,
                      (Teensy41_QS2_B.PulseGenerator1_a));
   if (zcEvent != NO_ZCEVENT) {
-    /* Gain: '<S45>/Filter Coefficient' incorporates:
-     *  DiscreteIntegrator: '<S37>/Filter'
-     *  Gain: '<S35>/Derivative Gain'
-     *  Sum: '<S37>/SumD'
+    if (Teensy41_QS2_DW.TriggeredSubsystem_RESET_ELAPS_) {
+      TriggeredSubsystem_ELAPS_T = 0U;
+    } else {
+      TriggeredSubsystem_ELAPS_T = Teensy41_QS2_M->Timing.clockTick0 -
+        Teensy41_QS2_DW.TriggeredSubsystem_PREV_T;
+    }
+
+    Teensy41_QS2_DW.TriggeredSubsystem_PREV_T =
+      Teensy41_QS2_M->Timing.clockTick0;
+    Teensy41_QS2_DW.TriggeredSubsystem_RESET_ELAPS_ = false;
+
+    /* DiscreteIntegrator: '<S44>/Integrator' incorporates:
+     *  Constant: '<S5>/Constant4'
+     */
+    if (Teensy41_QS2_DW.Integrator_SYSTEM_ENABLE == 0) {
+      if ((Teensy41_QS2_P.Constant4_Value > 0.0) &&
+          (Teensy41_QS2_DW.Integrator_PrevResetState <= 0)) {
+        Teensy41_QS2_DW.Integrator_DSTATE =
+          Teensy41_QS2_P.PIDController1_InitialConditi_m;
+      } else {
+        /* DiscreteIntegrator: '<S44>/Integrator' */
+        Teensy41_QS2_DW.Integrator_DSTATE += Teensy41_QS2_P.Integrator_gainval *
+          (real_T)TriggeredSubsystem_ELAPS_T * Teensy41_QS2_DW.Integrator_PREV_U;
+      }
+    }
+
+    /* End of DiscreteIntegrator: '<S44>/Integrator' */
+
+    /* DiscreteIntegrator: '<S39>/Filter' incorporates:
+     *  Constant: '<S5>/Constant4'
+     */
+    if (Teensy41_QS2_DW.Filter_SYSTEM_ENABLE == 0) {
+      if ((Teensy41_QS2_P.Constant4_Value > 0.0) &&
+          (Teensy41_QS2_DW.Filter_PrevResetState <= 0)) {
+        Teensy41_QS2_DW.Filter_DSTATE =
+          Teensy41_QS2_P.PIDController1_InitialCondition;
+      } else {
+        /* DiscreteIntegrator: '<S39>/Filter' */
+        Teensy41_QS2_DW.Filter_DSTATE += Teensy41_QS2_P.Filter_gainval * (real_T)
+          TriggeredSubsystem_ELAPS_T * Teensy41_QS2_DW.Filter_PREV_U;
+      }
+    }
+
+    /* End of DiscreteIntegrator: '<S39>/Filter' */
+
+    /* Product: '<S47>/NProd Out' incorporates:
+     *  Constant: '<S5>/Constant2'
+     *  Constant: '<S5>/Constant3'
+     *  Math: '<S5>/Math Function'
+     *  Product: '<S37>/DProd Out'
+     *  Sum: '<S39>/SumD'
+     *  UnitDelay: '<Root>/Unit Delay'
+     *
+     * About '<S5>/Math Function':
+     *  Operator: reciprocal
+     */
+    Teensy41_QS2_DW.Filter_PREV_U = (Teensy41_QS2_DW.UnitDelay_DSTATE *
+      Teensy41_QS2_P.Constant2_Value - Teensy41_QS2_DW.Filter_DSTATE) * (1.0 /
+      Teensy41_QS2_P.Constant3_Value);
+
+    /* Step: '<S4>/Step1' incorporates:
+     *  Constant: '<S5>/Constant'
+     *  Product: '<S49>/PProd Out'
+     *  Sum: '<S53>/Sum'
      *  UnitDelay: '<Root>/Unit Delay'
      */
-    Teensy41_QS2_B.PulseGenerator1_a = (Teensy41_QS2_P.PIDController1_D *
-      Teensy41_QS2_DW.UnitDelay_DSTATE - Teensy41_QS2_DW.Filter_DSTATE) *
-      Teensy41_QS2_P.PIDController1_N;
+    Teensy41_QS2_B.Saturation = (Teensy41_QS2_DW.UnitDelay_DSTATE *
+      Teensy41_QS2_P.Constant_Value + Teensy41_QS2_DW.Integrator_DSTATE) +
+      Teensy41_QS2_DW.Filter_PREV_U;
 
-    /* Product: '<S91>/Udiff*Ts Prod Out' incorporates:
-     *  Gain: '<S87>/Derivative Gain'
-     *  UnitDelay: '<Root>/Unit Delay1'
+    /* DeadZone: '<S36>/DeadZone' */
+    if (Teensy41_QS2_B.Saturation >
+        Teensy41_QS2_P.PIDController1_UpperSaturationL) {
+      /* Step: '<S4>/Step' */
+      Teensy41_QS2_DW.Integrator_PREV_U = Teensy41_QS2_B.Saturation -
+        Teensy41_QS2_P.PIDController1_UpperSaturationL;
+    } else if (Teensy41_QS2_B.Saturation >=
+               Teensy41_QS2_P.PIDController1_LowerSaturationL) {
+      /* Step: '<S4>/Step' */
+      Teensy41_QS2_DW.Integrator_PREV_U = 0.0;
+    } else {
+      /* Step: '<S4>/Step' */
+      Teensy41_QS2_DW.Integrator_PREV_U = Teensy41_QS2_B.Saturation -
+        Teensy41_QS2_P.PIDController1_LowerSaturationL;
+    }
+
+    /* End of DeadZone: '<S36>/DeadZone' */
+
+    /* RelationalOperator: '<S34>/Relational Operator' incorporates:
+     *  Constant: '<S34>/Clamping_zero'
      */
-    Teensy41_QS2_B.UdiffTsProdOut = Teensy41_QS2_P.PIDController2_D *
-      Teensy41_QS2_DW.UnitDelay1_DSTATE / (real_T)zcEvent;
+    rtb_RelationalOperator = (Teensy41_QS2_P.Clamping_zero_Value !=
+      Teensy41_QS2_DW.Integrator_PREV_U);
 
-    /* Sum: '<S5>/Sum' incorporates:
-     *  Delay: '<S89>/UD'
-     *  Gain: '<S101>/Proportional Gain'
-     *  Gain: '<S47>/Proportional Gain'
-     *  Gain: '<S5>/Gain'
-     *  Sum: '<S105>/Sum'
-     *  Sum: '<S51>/Sum'
-     *  Sum: '<S89>/Diff'
+    /* Switch: '<S34>/Switch1' incorporates:
+     *  Constant: '<S34>/Clamping_zero'
+     *  Constant: '<S34>/Constant'
+     *  Constant: '<S34>/Constant2'
+     *  RelationalOperator: '<S34>/fix for DT propagation issue'
+     */
+    if (Teensy41_QS2_DW.Integrator_PREV_U > Teensy41_QS2_P.Clamping_zero_Value)
+    {
+      rtb_Switch1 = Teensy41_QS2_P.Constant_Value_j;
+    } else {
+      rtb_Switch1 = Teensy41_QS2_P.Constant2_Value_o;
+    }
+
+    /* End of Switch: '<S34>/Switch1' */
+
+    /* Step: '<S4>/Step' incorporates:
+     *  Constant: '<S5>/Constant1'
+     *  Product: '<S41>/IProd Out'
      *  UnitDelay: '<Root>/Unit Delay'
-     *  UnitDelay: '<Root>/Unit Delay1'
      */
-    Teensy41_QS2_B.Sum = (Teensy41_QS2_P.PIDController1_P *
-                          Teensy41_QS2_DW.UnitDelay_DSTATE +
-                          Teensy41_QS2_B.PulseGenerator1_a) *
-      Teensy41_QS2_P.Gain_Gain - (Teensy41_QS2_P.PIDController2_P *
-      Teensy41_QS2_DW.UnitDelay1_DSTATE + (Teensy41_QS2_B.UdiffTsProdOut -
-      Teensy41_QS2_DW.UD_DSTATE));
+    Teensy41_QS2_DW.Integrator_PREV_U = Teensy41_QS2_DW.UnitDelay_DSTATE *
+      Teensy41_QS2_P.Constant1_Value_i;
 
-    /* Update for DiscreteIntegrator: '<S37>/Filter' incorporates:
-     *  Product: '<S56>/Ungain*Ts Prod Out'
+    /* Saturate: '<S51>/Saturation' */
+    if (Teensy41_QS2_B.Saturation >
+        Teensy41_QS2_P.PIDController1_UpperSaturationL) {
+      /* Step: '<S4>/Step1' incorporates:
+       *  Saturate: '<S51>/Saturation'
+       */
+      Teensy41_QS2_B.Saturation = Teensy41_QS2_P.PIDController1_UpperSaturationL;
+    } else if (Teensy41_QS2_B.Saturation <
+               Teensy41_QS2_P.PIDController1_LowerSaturationL) {
+      /* Step: '<S4>/Step1' incorporates:
+       *  Saturate: '<S51>/Saturation'
+       */
+      Teensy41_QS2_B.Saturation = Teensy41_QS2_P.PIDController1_LowerSaturationL;
+    }
+
+    /* End of Saturate: '<S51>/Saturation' */
+    /* Gain: '<S5>/Gain' */
+    Teensy41_QS2_B.Gain_b5 = Teensy41_QS2_P.Gain_Gain *
+      Teensy41_QS2_B.Saturation;
+
+    /* Update for DiscreteIntegrator: '<S44>/Integrator' incorporates:
+     *  Constant: '<S5>/Constant4'
      */
-    Teensy41_QS2_DW.Filter_DSTATE += Teensy41_QS2_B.PulseGenerator1_a * (real_T)
-      zcEvent * Teensy41_QS2_P.Filter_gainval;
+    Teensy41_QS2_DW.Integrator_SYSTEM_ENABLE = 0U;
+    if (Teensy41_QS2_P.Constant4_Value > 0.0) {
+      Teensy41_QS2_DW.Integrator_PrevResetState = 1;
+    } else if (Teensy41_QS2_P.Constant4_Value < 0.0) {
+      Teensy41_QS2_DW.Integrator_PrevResetState = -1;
+    } else if (Teensy41_QS2_P.Constant4_Value == 0.0) {
+      Teensy41_QS2_DW.Integrator_PrevResetState = 0;
+    } else {
+      Teensy41_QS2_DW.Integrator_PrevResetState = 2;
+    }
 
-    /* Update for Delay: '<S89>/UD' */
-    Teensy41_QS2_DW.UD_DSTATE = Teensy41_QS2_B.UdiffTsProdOut;
+    /* Switch: '<S34>/Switch2' incorporates:
+     *  Constant: '<S34>/Clamping_zero'
+     *  Constant: '<S34>/Constant3'
+     *  Constant: '<S34>/Constant4'
+     *  RelationalOperator: '<S34>/fix for DT propagation issue1'
+     */
+    if (Teensy41_QS2_DW.Integrator_PREV_U > Teensy41_QS2_P.Clamping_zero_Value)
+    {
+      tmp_2 = Teensy41_QS2_P.Constant3_Value_m;
+    } else {
+      tmp_2 = Teensy41_QS2_P.Constant4_Value_e;
+    }
+
+    /* Switch: '<S34>/Switch' incorporates:
+     *  Logic: '<S34>/AND3'
+     *  RelationalOperator: '<S34>/Equal1'
+     *  Switch: '<S34>/Switch2'
+     */
+    if (rtb_RelationalOperator && (rtb_Switch1 == tmp_2)) {
+      /* Step: '<S4>/Step' incorporates:
+       *  Constant: '<S34>/Constant1'
+       *  DiscreteIntegrator: '<S44>/Integrator'
+       */
+      Teensy41_QS2_DW.Integrator_PREV_U = Teensy41_QS2_P.Constant1_Value;
+    }
+
+    /* End of Switch: '<S34>/Switch' */
+
+    /* Update for DiscreteIntegrator: '<S39>/Filter' incorporates:
+     *  Constant: '<S5>/Constant4'
+     */
+    Teensy41_QS2_DW.Filter_SYSTEM_ENABLE = 0U;
+    if (Teensy41_QS2_P.Constant4_Value > 0.0) {
+      Teensy41_QS2_DW.Filter_PrevResetState = 1;
+    } else if (Teensy41_QS2_P.Constant4_Value < 0.0) {
+      Teensy41_QS2_DW.Filter_PrevResetState = -1;
+    } else if (Teensy41_QS2_P.Constant4_Value == 0.0) {
+      Teensy41_QS2_DW.Filter_PrevResetState = 0;
+    } else {
+      Teensy41_QS2_DW.Filter_PrevResetState = 2;
+    }
+
+    /* End of Update for DiscreteIntegrator: '<S39>/Filter' */
     Teensy41_QS2_DW.TriggeredSubsystem_SubsysRanBC = 4;
   }
 
   /* End of Outputs for SubSystem: '<S1>/Triggered Subsystem' */
-  /* End of Outputs for SubSystem: '<Root>/Controller' */
   /* RateTransition generated from: '<S4>/QS2' incorporates:
    *  RateTransition: '<S4>/Rate Transition2'
    */
-  tmp = Teensy41_QS2_M->Timing.RateInteraction.TID0_1;
-  if (tmp) {
+  rtb_RelationalOperator = Teensy41_QS2_M->Timing.RateInteraction.TID0_1;
+  if (rtb_RelationalOperator) {
     /* RateTransition generated from: '<S4>/QS2' */
     Teensy41_QS2_B.TmpRTBAtQS2Inport2 =
       Teensy41_QS2_DW.TmpRTBAtQS2Inport2_Buffer0;
@@ -277,21 +441,21 @@ void Teensy41_QS2_step0(void)          /* Sample time: [0.0005s, 0.0s] */
   /* End of DiscretePulseGenerator: '<S4>/Pulse Generator1' */
 
   /* Outputs for Triggered SubSystem: '<S4>/QS2' incorporates:
-   *  TriggerPort: '<S117>/Trigger'
+   *  TriggerPort: '<S119>/Trigger'
    */
   zcEvent = rt_ZCFcn(RISING_ZERO_CROSSING,&Teensy41_QS2_PrevZCX.QS2_Trig_ZCE,
                      (Teensy41_QS2_B.PulseGenerator1_a));
   if (zcEvent != NO_ZCEVENT) {
-    /* MATLAB Function: '<S117>/MATLAB Function1' incorporates:
+    /* MATLAB Function: '<S119>/MATLAB Function1' incorporates:
      *  Constant: '<Root>/BLUE'
      *  Constant: '<Root>/GREEN'
      *  Constant: '<Root>/RED'
      *  Constant: '<S4>/Constant'
      */
     Teensy41_QS2_B.y = Teensy41_QS2_P.RED_Value;
-    Teensy41_QS2_B.UdiffTsProdOut = Teensy41_QS2_P.GREEN_Value;
+    Teensy41_QS2_B.b_y = Teensy41_QS2_P.GREEN_Value;
     Teensy41_QS2_B.PulseGenerator1_a = Teensy41_QS2_P.BLUE_Value;
-    Teensy41_QS2_DW.stop = ((Teensy41_QS2_P.Constant_Value > 0.0) ||
+    Teensy41_QS2_DW.stop = ((Teensy41_QS2_P.Constant_Value_p > 0.0) ||
       Teensy41_QS2_DW.stop);
     startup = true;
     if (Teensy41_QS2_DW.count_startup >= 5.0) {
@@ -306,23 +470,31 @@ void Teensy41_QS2_step0(void)          /* Sample time: [0.0005s, 0.0s] */
     Teensy41_QS2_B.data_out[0] = 1U;
     Teensy41_QS2_B.data_out[2] = 31U;
 
-    /* Saturate: '<S117>/+- 10V' */
-    if (Teensy41_QS2_B.Sum > Teensy41_QS2_P.u0V_UpperSat) {
-      Teensy41_QS2_B.R_LED = Teensy41_QS2_P.u0V_UpperSat;
-    } else if (Teensy41_QS2_B.Sum < Teensy41_QS2_P.u0V_LowerSat) {
-      Teensy41_QS2_B.R_LED = Teensy41_QS2_P.u0V_LowerSat;
+    /* Saturate: '<Root>/+- 10V1' */
+    if (Teensy41_QS2_B.Gain_b5 > Teensy41_QS2_P.u0V1_UpperSat) {
+      y = Teensy41_QS2_P.u0V1_UpperSat;
+    } else if (Teensy41_QS2_B.Gain_b5 < Teensy41_QS2_P.u0V1_LowerSat) {
+      y = Teensy41_QS2_P.u0V1_LowerSat;
     } else {
-      Teensy41_QS2_B.R_LED = Teensy41_QS2_B.Sum;
+      y = Teensy41_QS2_B.Gain_b5;
     }
 
-    /* MATLAB Function: '<S117>/MATLAB Function1' incorporates:
-     *  Saturate: '<S117>/+- 10V'
+    /* End of Saturate: '<Root>/+- 10V1' */
+
+    /* Saturate: '<S119>/+- 10V' */
+    if (y > Teensy41_QS2_P.u0V_UpperSat) {
+      y = Teensy41_QS2_P.u0V_UpperSat;
+    } else if (y < Teensy41_QS2_P.u0V_LowerSat) {
+      y = Teensy41_QS2_P.u0V_LowerSat;
+    }
+
+    /* MATLAB Function: '<S119>/MATLAB Function1' incorporates:
+     *  Saturate: '<S119>/+- 10V'
      */
-    Teensy41_QS2_B.R_LED = rt_roundd_snf(Teensy41_QS2_B.R_LED *
-      41.666666666666664);
-    if (Teensy41_QS2_B.R_LED < 32768.0) {
-      if (Teensy41_QS2_B.R_LED >= -32768.0) {
-        x = (int16_T)Teensy41_QS2_B.R_LED;
+    y = rt_roundd_snf(y * 41.666666666666664);
+    if (y < 32768.0) {
+      if (y >= -32768.0) {
+        x = (int16_T)y;
       } else {
         x = MIN_int16_T;
       }
@@ -339,41 +511,41 @@ void Teensy41_QS2_step0(void)          /* Sample time: [0.0005s, 0.0s] */
       Teensy41_QS2_B.data_out[15] = 0U;
       Teensy41_QS2_B.data_out[16] = 0U;
       Teensy41_QS2_B.y = 1.0;
-      Teensy41_QS2_B.UdiffTsProdOut = 0.0;
+      Teensy41_QS2_B.b_y = 0.0;
       Teensy41_QS2_B.PulseGenerator1_a = 0.0;
     }
 
     /* Step: '<S4>/Step' incorporates:
      *  Step: '<S4>/Step1'
      */
-    Teensy41_QS2_B.R_LED = Teensy41_QS2_M->Timing.taskTime0;
-    if (Teensy41_QS2_B.R_LED < Teensy41_QS2_P.ts) {
-      tmp_5 = Teensy41_QS2_P.Step_Y0;
+    y = Teensy41_QS2_M->Timing.taskTime0;
+    if (y < Teensy41_QS2_P.ts) {
+      tmp_3 = Teensy41_QS2_P.Step_Y0;
     } else {
-      tmp_5 = Teensy41_QS2_P.Step_YFinal;
+      tmp_3 = Teensy41_QS2_P.Step_YFinal;
     }
 
     /* Step: '<S4>/Step1' */
-    if (Teensy41_QS2_B.R_LED < 2.0 * Teensy41_QS2_P.ts) {
-      Teensy41_QS2_B.R_LED = Teensy41_QS2_P.Step1_Y0;
+    if (y < 2.0 * Teensy41_QS2_P.ts) {
+      y = Teensy41_QS2_P.Step1_Y0;
     } else {
-      Teensy41_QS2_B.R_LED = Teensy41_QS2_P.Step1_YFinal;
+      y = Teensy41_QS2_P.Step1_YFinal;
     }
 
-    /* MATLAB Function: '<S117>/MATLAB Function1' incorporates:
+    /* MATLAB Function: '<S119>/MATLAB Function1' incorporates:
      *  Constant: '<S4>/Reset_manual'
      *  Logic: '<S4>/Logical Operator'
      *  Step: '<S4>/Step'
      *  Step: '<S4>/Step1'
      *  Sum: '<S4>/Sum'
      */
-    if ((Teensy41_QS2_P.Reset_manual_Value != 0.0) || (tmp_5 +
-         Teensy41_QS2_B.R_LED != 0.0) || startup) {
+    if ((Teensy41_QS2_P.Reset_manual_Value != 0.0) || (tmp_3 + y != 0.0) ||
+        startup) {
       Teensy41_QS2_B.data_out[2] = 127U;
       Teensy41_QS2_B.data_out[15] = 0U;
       Teensy41_QS2_B.data_out[16] = 0U;
       Teensy41_QS2_B.y = 1.0;
-      Teensy41_QS2_B.UdiffTsProdOut = 1.0;
+      Teensy41_QS2_B.b_y = 1.0;
       Teensy41_QS2_B.PulseGenerator1_a = 1.0;
     }
 
@@ -383,7 +555,7 @@ void Teensy41_QS2_step0(void)          /* Sample time: [0.0005s, 0.0s] */
       Teensy41_QS2_B.data_out[15] = 0U;
       Teensy41_QS2_B.data_out[16] = 0U;
       Teensy41_QS2_B.y = 1.0;
-      Teensy41_QS2_B.UdiffTsProdOut = 0.0;
+      Teensy41_QS2_B.b_y = 0.0;
       Teensy41_QS2_B.PulseGenerator1_a = 0.0;
     }
 
@@ -396,17 +568,16 @@ void Teensy41_QS2_step0(void)          /* Sample time: [0.0005s, 0.0s] */
       Teensy41_QS2_B.y = 1.0;
     }
 
-    Teensy41_QS2_B.R_LED = 999.0 * Teensy41_QS2_B.y;
-    if ((Teensy41_QS2_B.UdiffTsProdOut <= 0.0) || rtIsNaN
-        (Teensy41_QS2_B.UdiffTsProdOut)) {
-      Teensy41_QS2_B.UdiffTsProdOut = 0.0;
+    y = 999.0 * Teensy41_QS2_B.y;
+    if ((Teensy41_QS2_B.b_y <= 0.0) || rtIsNaN(Teensy41_QS2_B.b_y)) {
+      Teensy41_QS2_B.b_y = 0.0;
     }
 
-    if (Teensy41_QS2_B.UdiffTsProdOut >= 1.0) {
-      Teensy41_QS2_B.UdiffTsProdOut = 1.0;
+    if (Teensy41_QS2_B.b_y >= 1.0) {
+      Teensy41_QS2_B.b_y = 1.0;
     }
 
-    Teensy41_QS2_B.UdiffTsProdOut *= 999.0;
+    Teensy41_QS2_B.b_y *= 999.0;
     if ((Teensy41_QS2_B.PulseGenerator1_a <= 0.0) || rtIsNaN
         (Teensy41_QS2_B.PulseGenerator1_a)) {
       Teensy41_QS2_B.PulseGenerator1_a = 0.0;
@@ -417,48 +588,48 @@ void Teensy41_QS2_step0(void)          /* Sample time: [0.0005s, 0.0s] */
     }
 
     Teensy41_QS2_B.PulseGenerator1_a *= 999.0;
-    Double2MultiWord(Teensy41_QS2_B.R_LED, &Teensy41_QS2_B.r.chunks[0U], 2);
+    Double2MultiWord(y, &Teensy41_QS2_B.r.chunks[0U], 2);
     Teensy41_QS2_B.data_out[3] = (uint8_T)(MultiWord2sLong
       (&Teensy41_QS2_B.r.chunks[0U]) >> 8);
-    Double2MultiWord(Teensy41_QS2_B.R_LED, &tmp_0.chunks[0U], 2);
+    Double2MultiWord(y, &Teensy41_QS2_B.r1.chunks[0U], 2);
     Teensy41_QS2_B.data_out[4] = (uint8_T)((uint32_T)MultiWord2sLong
-      (&tmp_0.chunks[0U]) & 255U);
-    Double2MultiWord(Teensy41_QS2_B.UdiffTsProdOut, &tmp_1.chunks[0U], 2);
-    Teensy41_QS2_B.data_out[5] = (uint8_T)(MultiWord2sLong(&tmp_1.chunks[0U]) >>
-      8);
-    Double2MultiWord(Teensy41_QS2_B.UdiffTsProdOut, &tmp_2.chunks[0U], 2);
+      (&Teensy41_QS2_B.r1.chunks[0U]) & 255U);
+    Double2MultiWord(Teensy41_QS2_B.b_y, &Teensy41_QS2_B.r2.chunks[0U], 2);
+    Teensy41_QS2_B.data_out[5] = (uint8_T)(MultiWord2sLong
+      (&Teensy41_QS2_B.r2.chunks[0U]) >> 8);
+    Double2MultiWord(Teensy41_QS2_B.b_y, &tmp.chunks[0U], 2);
     Teensy41_QS2_B.data_out[6] = (uint8_T)((uint32_T)MultiWord2sLong
-      (&tmp_2.chunks[0U]) & 255U);
-    Double2MultiWord(Teensy41_QS2_B.PulseGenerator1_a, &tmp_3.chunks[0U], 2);
-    Teensy41_QS2_B.data_out[7] = (uint8_T)(MultiWord2sLong(&tmp_3.chunks[0U]) >>
+      (&tmp.chunks[0U]) & 255U);
+    Double2MultiWord(Teensy41_QS2_B.PulseGenerator1_a, &tmp_0.chunks[0U], 2);
+    Teensy41_QS2_B.data_out[7] = (uint8_T)(MultiWord2sLong(&tmp_0.chunks[0U]) >>
       8);
-    Double2MultiWord(Teensy41_QS2_B.PulseGenerator1_a, &tmp_4.chunks[0U], 2);
+    Double2MultiWord(Teensy41_QS2_B.PulseGenerator1_a, &tmp_1.chunks[0U], 2);
     Teensy41_QS2_B.data_out[8] = (uint8_T)((uint32_T)MultiWord2sLong
-      (&tmp_4.chunks[0U]) & 255U);
+      (&tmp_1.chunks[0U]) & 255U);
 
-    /* MATLABSystem: '<S117>/SPI WriteRead' */
+    /* MATLABSystem: '<S119>/SPI WriteRead' */
     if (Teensy41_QS2_DW.obj.slaveSelectPin_ !=
         Teensy41_QS2_P.SPIWriteRead_slaveSelectPin_) {
       Teensy41_QS2_DW.obj.slaveSelectPin_ =
         Teensy41_QS2_P.SPIWriteRead_slaveSelectPin_;
     }
 
-    Teensy41_QS2_B.R_LED = rt_roundd_snf(Teensy41_QS2_DW.obj.slaveSelectPin_);
-    if (Teensy41_QS2_B.R_LED < 256.0) {
-      if (Teensy41_QS2_B.R_LED >= 0.0) {
-        tmp_6 = (uint8_T)Teensy41_QS2_B.R_LED;
+    y = rt_roundd_snf(Teensy41_QS2_DW.obj.slaveSelectPin_);
+    if (y < 256.0) {
+      if (y >= 0.0) {
+        tmp_4 = (uint8_T)y;
       } else {
-        tmp_6 = 0U;
+        tmp_4 = 0U;
       }
     } else {
-      tmp_6 = MAX_uint8_T;
+      tmp_4 = MAX_uint8_T;
     }
 
-    MW_SPIwriteReadLoop(0, tmp_6, &Teensy41_QS2_B.data_out[0], 17.0, 1.0,
+    MW_SPIwriteReadLoop(0, tmp_4, &Teensy41_QS2_B.data_out[0], 17.0, 1.0,
                         &Teensy41_QS2_B.uv[0]);
 
-    /* MATLAB Function: '<S117>/MATLAB Function' incorporates:
-     *  MATLABSystem: '<S117>/SPI WriteRead'
+    /* MATLAB Function: '<S119>/MATLAB Function' incorporates:
+     *  MATLABSystem: '<S119>/SPI WriteRead'
      */
     Teensy41_QS2_B.encoder0 = ((int32_T)((uint32_T)Teensy41_QS2_B.uv[2] << 16 |
       (uint32_T)Teensy41_QS2_B.uv[3] << 8 | Teensy41_QS2_B.uv[4]) << 8) >> 8;
@@ -471,16 +642,16 @@ void Teensy41_QS2_step0(void)          /* Sample time: [0.0005s, 0.0s] */
 
     Teensy41_QS2_B.encoder1 = i;
 
-    /* End of MATLAB Function: '<S117>/MATLAB Function' */
+    /* End of MATLAB Function: '<S119>/MATLAB Function' */
 
-    /* Stop: '<S117>/Stop Simulation' incorporates:
-     *  MATLAB Function: '<S117>/MATLAB Function1'
+    /* Stop: '<S119>/Stop Simulation' incorporates:
+     *  MATLAB Function: '<S119>/MATLAB Function1'
      */
     if (Teensy41_QS2_DW.count_stop > 1.0) {
       rtmSetStopRequested(Teensy41_QS2_M, 1);
     }
 
-    /* End of Stop: '<S117>/Stop Simulation' */
+    /* End of Stop: '<S119>/Stop Simulation' */
     Teensy41_QS2_DW.QS2_SubsysRanBC = 4;
   }
 
@@ -499,7 +670,7 @@ void Teensy41_QS2_step0(void)          /* Sample time: [0.0005s, 0.0s] */
 
   /* End of MATLAB Function: '<S4>/MATLAB Function' */
   /* RateTransition: '<S4>/Rate Transition2' */
-  if (tmp) {
+  if (rtb_RelationalOperator) {
     Teensy41_QS2_DW.RateTransition2_Buffer = Teensy41_QS2_B.y_b;
   }
 
@@ -512,23 +683,11 @@ void Teensy41_QS2_step0(void)          /* Sample time: [0.0005s, 0.0s] */
   }
 
   /* End of MATLAB Function: '<S4>/MATLAB Function1' */
-  /* Gain: '<S3>/Gain' incorporates:
-   *  UnitDelay: '<Root>/Unit Delay1'
-   */
-  Teensy41_QS2_B.Gain = Teensy41_QS2_P.Gain_Gain_m *
-    Teensy41_QS2_DW.UnitDelay1_DSTATE;
-
-  /* Gain: '<S2>/Gain' incorporates:
-   *  UnitDelay: '<Root>/Unit Delay'
-   */
-  Teensy41_QS2_B.Gain_b = Teensy41_QS2_P.Gain_Gain_k *
-    Teensy41_QS2_DW.UnitDelay_DSTATE;
+  /* Update for UnitDelay: '<Root>/Unit Delay1' */
+  Teensy41_QS2_DW.UnitDelay1_DSTATE = Teensy41_QS2_B.y;
 
   /* Update for UnitDelay: '<Root>/Unit Delay' */
   Teensy41_QS2_DW.UnitDelay_DSTATE = Teensy41_QS2_B.y_b;
-
-  /* Update for UnitDelay: '<Root>/Unit Delay1' */
-  Teensy41_QS2_DW.UnitDelay1_DSTATE = Teensy41_QS2_B.y;
 
   /* Update absolute time */
   /* The "clockTick0" counts the number of times the code of this task has
@@ -550,11 +709,11 @@ void Teensy41_QS2_step1(void)          /* Sample time: [0.001s, 0.0s] */
    *  Abs: '<S4>/Abs'
    *  Constant: '<Root>/Motor Enable'
    *  Constant: '<Root>/Protection'
-   *  Constant: '<S114>/Constant'
-   *  Gain: '<S118>/Gain'
+   *  Constant: '<S116>/Constant'
+   *  Gain: '<S120>/Gain'
    *  Product: '<S4>/Product'
    *  RateTransition: '<S4>/Rate Transition2'
-   *  RelationalOperator: '<S114>/Compare'
+   *  RelationalOperator: '<S116>/Compare'
    */
   rtb_LogicalOperator1 = ((Teensy41_QS2_P.MotorEnable_Value != 0.0) && (fabs
     (Teensy41_QS2_P.Gain_Gain_f * Teensy41_QS2_DW.RateTransition2_Buffer *
@@ -583,29 +742,37 @@ void Teensy41_QS2_initialize(void)
   Teensy41_QS2_M->Timing.stepSize0 = 0.0005;
 
   /* External mode info */
-  Teensy41_QS2_M->Sizes.checksums[0] = (2099813562U);
-  Teensy41_QS2_M->Sizes.checksums[1] = (850932388U);
-  Teensy41_QS2_M->Sizes.checksums[2] = (3905572026U);
-  Teensy41_QS2_M->Sizes.checksums[3] = (1681306229U);
+  Teensy41_QS2_M->Sizes.checksums[0] = (1616110258U);
+  Teensy41_QS2_M->Sizes.checksums[1] = (251356189U);
+  Teensy41_QS2_M->Sizes.checksums[2] = (1367474973U);
+  Teensy41_QS2_M->Sizes.checksums[3] = (1424765171U);
 
   {
     static const sysRanDType rtAlwaysEnabled = SUBSYS_RAN_BC_ENABLE;
     static RTWExtModeInfo rt_ExtModeInfo;
-    static const sysRanDType *systemRan[11];
+    static const sysRanDType *systemRan[15];
     Teensy41_QS2_M->extModeInfo = (&rt_ExtModeInfo);
     rteiSetSubSystemActiveVectorAddresses(&rt_ExtModeInfo, systemRan);
     systemRan[0] = &rtAlwaysEnabled;
     systemRan[1] = (sysRanDType *)
       &Teensy41_QS2_DW.TriggeredSubsystem_SubsysRanBC;
-    systemRan[2] = &rtAlwaysEnabled;
-    systemRan[3] = &rtAlwaysEnabled;
-    systemRan[4] = &rtAlwaysEnabled;
-    systemRan[5] = (sysRanDType *)&Teensy41_QS2_DW.QS2_SubsysRanBC;
-    systemRan[6] = (sysRanDType *)&Teensy41_QS2_DW.QS2_SubsysRanBC;
-    systemRan[7] = (sysRanDType *)&Teensy41_QS2_DW.QS2_SubsysRanBC;
-    systemRan[8] = (sysRanDType *)&Teensy41_QS2_DW.QS2_SubsysRanBC;
-    systemRan[9] = &rtAlwaysEnabled;
-    systemRan[10] = &rtAlwaysEnabled;
+    systemRan[2] = (sysRanDType *)
+      &Teensy41_QS2_DW.TriggeredSubsystem_SubsysRanBC;
+    systemRan[3] = (sysRanDType *)
+      &Teensy41_QS2_DW.TriggeredSubsystem_SubsysRanBC;
+    systemRan[4] = (sysRanDType *)
+      &Teensy41_QS2_DW.TriggeredSubsystem_SubsysRanBC;
+    systemRan[5] = (sysRanDType *)
+      &Teensy41_QS2_DW.TriggeredSubsystem_SubsysRanBC;
+    systemRan[6] = &rtAlwaysEnabled;
+    systemRan[7] = &rtAlwaysEnabled;
+    systemRan[8] = &rtAlwaysEnabled;
+    systemRan[9] = (sysRanDType *)&Teensy41_QS2_DW.QS2_SubsysRanBC;
+    systemRan[10] = (sysRanDType *)&Teensy41_QS2_DW.QS2_SubsysRanBC;
+    systemRan[11] = (sysRanDType *)&Teensy41_QS2_DW.QS2_SubsysRanBC;
+    systemRan[12] = (sysRanDType *)&Teensy41_QS2_DW.QS2_SubsysRanBC;
+    systemRan[13] = &rtAlwaysEnabled;
+    systemRan[14] = &rtAlwaysEnabled;
     rteiSetModelMappingInfoPtr(Teensy41_QS2_M->extModeInfo,
       &Teensy41_QS2_M->SpecialInfo.mappingInfo);
     rteiSetChecksumsPtr(Teensy41_QS2_M->extModeInfo,
@@ -623,40 +790,41 @@ void Teensy41_QS2_initialize(void)
     Teensy41_QS2_PrevZCX.TriggeredSubsystem_Trig_ZCE = UNINITIALIZED_ZCSIG;
     Teensy41_QS2_PrevZCX.QS2_Trig_ZCE = UNINITIALIZED_ZCSIG;
 
-    /* InitializeConditions for UnitDelay: '<Root>/Unit Delay' */
-    Teensy41_QS2_DW.UnitDelay_DSTATE = Teensy41_QS2_P.UnitDelay_InitialCondition;
-
     /* InitializeConditions for UnitDelay: '<Root>/Unit Delay1' */
     Teensy41_QS2_DW.UnitDelay1_DSTATE =
       Teensy41_QS2_P.UnitDelay1_InitialCondition;
+
+    /* InitializeConditions for UnitDelay: '<Root>/Unit Delay' */
+    Teensy41_QS2_DW.UnitDelay_DSTATE = Teensy41_QS2_P.UnitDelay_InitialCondition;
 
     /* InitializeConditions for RateTransition generated from: '<S4>/QS2' */
     Teensy41_QS2_DW.TmpRTBAtQS2Inport2_Buffer0 =
       Teensy41_QS2_P.TmpRTBAtQS2Inport2_InitialCondi;
 
-    /* SystemInitialize for Atomic SubSystem: '<Root>/Controller' */
-    /* SystemInitialize for Triggered SubSystem: '<S1>/Triggered Subsystem' */
-    /* InitializeConditions for DiscreteIntegrator: '<S37>/Filter' */
+    /* InitializeConditions for DiscreteIntegrator: '<S44>/Integrator' */
+    Teensy41_QS2_DW.Integrator_DSTATE =
+      Teensy41_QS2_P.PIDController1_InitialConditi_m;
+    Teensy41_QS2_DW.Integrator_PrevResetState = 2;
+
+    /* InitializeConditions for DiscreteIntegrator: '<S39>/Filter' */
     Teensy41_QS2_DW.Filter_DSTATE =
       Teensy41_QS2_P.PIDController1_InitialCondition;
+    Teensy41_QS2_DW.Filter_PrevResetState = 2;
 
-    /* InitializeConditions for Delay: '<S89>/UD' */
-    Teensy41_QS2_DW.UD_DSTATE = Teensy41_QS2_P.PIDController2_DifferentiatorIC;
-
-    /* SystemInitialize for Sum: '<S5>/Sum' incorporates:
+    /* SystemInitialize for Gain: '<S5>/Gain' incorporates:
      *  Outport: '<S5>/Vm'
      */
-    Teensy41_QS2_B.Sum = Teensy41_QS2_P.Vm_Y0;
+    Teensy41_QS2_B.Gain_b5 = Teensy41_QS2_P.Vm_Y0;
 
     /* End of SystemInitialize for SubSystem: '<S1>/Triggered Subsystem' */
     /* End of SystemInitialize for SubSystem: '<Root>/Controller' */
 
     /* SystemInitialize for Triggered SubSystem: '<S4>/QS2' */
-    /* SystemInitialize for MATLAB Function: '<S117>/MATLAB Function1' */
+    /* SystemInitialize for MATLAB Function: '<S119>/MATLAB Function1' */
     Teensy41_QS2_DW.count_startup = 1.0;
     Teensy41_QS2_DW.count_stop = 1.0;
 
-    /* Start for MATLABSystem: '<S117>/SPI WriteRead' */
+    /* Start for MATLABSystem: '<S119>/SPI WriteRead' */
     Teensy41_QS2_DW.obj.matlabCodegenIsDeleted = false;
     Teensy41_QS2_DW.obj.slaveSelectPin_ =
       Teensy41_QS2_P.SPIWriteRead_slaveSelectPin_;
@@ -675,15 +843,28 @@ void Teensy41_QS2_initialize(void)
     MW_SSpinSetup(tmp_0);
     Teensy41_QS2_DW.obj.isSetupComplete = true;
 
-    /* End of Start for MATLABSystem: '<S117>/SPI WriteRead' */
+    /* End of Start for MATLABSystem: '<S119>/SPI WriteRead' */
 
-    /* SystemInitialize for Outport: '<S117>/encoder0' */
+    /* SystemInitialize for Outport: '<S119>/encoder0' */
     Teensy41_QS2_B.encoder0 = Teensy41_QS2_P.encoder0_Y0;
 
-    /* SystemInitialize for Outport: '<S117>/encoder1' */
+    /* SystemInitialize for Outport: '<S119>/encoder1' */
     Teensy41_QS2_B.encoder1 = Teensy41_QS2_P.encoder1_Y0;
 
     /* End of SystemInitialize for SubSystem: '<S4>/QS2' */
+
+    /* Enable for Atomic SubSystem: '<Root>/Controller' */
+    /* Enable for Triggered SubSystem: '<S1>/Triggered Subsystem' */
+    Teensy41_QS2_DW.TriggeredSubsystem_RESET_ELAPS_ = true;
+
+    /* Enable for DiscreteIntegrator: '<S44>/Integrator' */
+    Teensy41_QS2_DW.Integrator_SYSTEM_ENABLE = 1U;
+
+    /* Enable for DiscreteIntegrator: '<S39>/Filter' */
+    Teensy41_QS2_DW.Filter_SYSTEM_ENABLE = 1U;
+
+    /* End of Enable for SubSystem: '<S1>/Triggered Subsystem' */
+    /* End of Enable for SubSystem: '<Root>/Controller' */
   }
 }
 
@@ -691,12 +872,12 @@ void Teensy41_QS2_initialize(void)
 void Teensy41_QS2_terminate(void)
 {
   /* Terminate for Triggered SubSystem: '<S4>/QS2' */
-  /* Terminate for MATLABSystem: '<S117>/SPI WriteRead' */
+  /* Terminate for MATLABSystem: '<S119>/SPI WriteRead' */
   if (!Teensy41_QS2_DW.obj.matlabCodegenIsDeleted) {
     Teensy41_QS2_DW.obj.matlabCodegenIsDeleted = true;
   }
 
-  /* End of Terminate for MATLABSystem: '<S117>/SPI WriteRead' */
+  /* End of Terminate for MATLABSystem: '<S119>/SPI WriteRead' */
   /* End of Terminate for SubSystem: '<S4>/QS2' */
 }
 

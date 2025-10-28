@@ -128,6 +128,30 @@ grid
 
 
 
+% G_Theta_Alpha.den{1}(3) = G_Theta_Alpha.den{1}(3)*-1;
+
+
+G_U_Alpha = minreal(G_Theta_Alpha*G_u_Theta)
+
+G_Theta_Alpha*G_u_Theta
+
+% rltool(G_U_Alpha)
+
+
+
+%% U -> Theta
+[num, den] = tfdata(G_u_Theta, 'v');
+G_u_Theta_Test.Numerator = num;
+G_u_Theta_Test.Denominator = den;
+
+
+
+
+%% Theta -> Alpha
+[num, den] = tfdata(G_Theta_Alpha, 'v');
+G_Theta_Alpha_Test.Numerator = num;
+G_Theta_Alpha_Test.Denominator = den;
+
 % 
 % %% Known System Parameters
 % M = 0.2;

@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'Teensy41_QS2'.
  *
- * Model version                  : 1.106
+ * Model version                  : 1.108
  * Simulink Coder version         : 24.2 (R2024b) 21-Jun-2024
- * C/C++ source code generated on : Thu Oct 16 17:23:41 2025
+ * C/C++ source code generated on : Tue Oct 28 19:15:10 2025
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex
